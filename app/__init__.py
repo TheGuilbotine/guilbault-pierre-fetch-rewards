@@ -17,7 +17,26 @@ database = [
 
 @app.route('/')
 def balances():
+    """
+    Returns all current balances
+    """
     res = {}
     for data_column in database:
         res[data_column["payer"]] = data_column["points"]
     return res
+
+
+@app.route('/transactions', methods=['POST'])
+def catch_points():
+    """
+    Adds points from a specific payer and at a specific time
+    """
+    pass
+
+
+@app.route('/spend_points', methods=['POST'])
+def throw_points:
+    """
+    Spends points in total from each of the most recent transaction times until points are spent
+    """
+    pass
