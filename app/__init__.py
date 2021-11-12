@@ -35,8 +35,11 @@ def catch_points():
 
 
 @app.route('/spend_points', methods=['POST'])
-def throw_points:
+def throw_points():
     """
     Spends points in total from each of the most recent transaction times until points are spent
     """
     pass
+
+
+# Do these need to be a PUT methods? Spend points should be I think. Will I also need to use forms?
