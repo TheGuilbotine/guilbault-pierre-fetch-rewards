@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 flask = "~=1.1"
 python-dotenv = "~=0.13"
+wtforms = "*"
+flask-wtf = "*"
 
 [dev-packages]
 

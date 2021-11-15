@@ -1,7 +1,9 @@
 from flask import Flask
+# from flask_restful import Resource, Api, reqparse
 app = Flask(__name__)
+# api = Api(app)
 
-database = [
+TRANSACTIONS = [
     {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
     {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
     {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"},
@@ -9,8 +11,12 @@ database = [
     {"payer": "MILLER COORS", "points": 10000,
         "timestamp": "2020-11-01T14:00:00Z"},
     {"payer": "DANNON", "points": 300, "timestamp": "2020-10-31T10:00:00Z"}
-
 ]
+
+BALANCES = []
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 # example objects { "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
 
