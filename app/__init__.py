@@ -15,9 +15,12 @@ TRANSACTIONS = [
 ]
 
 
-# def make_balances(transactions):
-#     for transaction in transaction:
-#         if BALANCES[""]
+def make_balances(transactions):
+    for transaction in transactions:
+        print(transaction)
+
+
+make_balances(TRANSACTIONS)
 
 
 BALANCES = []
