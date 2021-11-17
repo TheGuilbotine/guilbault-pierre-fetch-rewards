@@ -17,7 +17,7 @@ def make_balances(transactions):
             BALANCES[transaction["payer"]]["points"] += transaction["points"]
         else:
             BALANCES[transaction["payer"]] = {
-                "points": transaction["points"], "timestamp": transaction["timestamp"]}
+                "payer": transaction["payer"], "points": transaction["points"]}
         print(BALANCES)
 
 
