@@ -32,7 +32,8 @@ def make_balance(transaction):
                     # exit so that negative amount not shown.
                     return
                 else:
-                    balance["points"] += transaction["points"]
+                    balance["points"] = balance["points"] + \
+                        transaction["points"]
             else:
                 print(
                     f'{transaction["payer"]} has been added to Balances with {transaction["points"]} points.')
@@ -59,7 +60,6 @@ def balances():
 
 @app.route('/transaction', methods=['POST'])
 def catch_points():
-    print("YOU ARE IN THE transaction route")
     """
     Adds points from a specific payer and at a specific time
     """
@@ -84,14 +84,25 @@ def throw_points():
     """
     Spends points in total from each of the oldest90 transaction times until points are spent
     """
+    data = request.get_json()
+    print(data)
+    totalPointsToSpend = data["points"]
+    pointsSpent = data["points"]
     orderedTransactions = [*TRANSACTIONS]
     orderedTransactions.sort(
         key=lambda transaction: transaction['timestamp'])
-    data = request.get_json()
-    now = datetime.utcnow()
-    oldest = min(dt["timestamp"] for dt in BALANCES if dt < now)
-    print(oldest)
-    pass
+    if pointsSpent > 0:
+        for transaction in orderedTransactions:
+            pointsRemainingBefore = pointsSpent
+            pointsSpent -= transaction["points"]
+            pointsRemainingAfter = pointsSpent
+            for balance in BALANCES:
+                if balance["payer"] == transaction["payer"]:
+                    balance["points"] = balance["points"] - pointsSpent
+                    # (pointsRemainingBefore - pointsRemainingAfter)
+    else:
+        print(f"All points have been spent. New balances are {BALANCES}")
+    return f"Successfully spent points, balances are as follows{BALANCES}", 201
 
 
 # Do these need to be a PUT methods? Spend points should be I think. Will I also need to use forms?
