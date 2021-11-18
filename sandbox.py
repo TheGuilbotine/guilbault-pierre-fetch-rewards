@@ -20,25 +20,32 @@ BALANCES = []
 #     print(BALANCES)
 
 def make_balance(transaction):
-    print(BALANCES)
     if len(BALANCES) == 0:
+        print(
+            f'{transaction["payer"]} has been added to your Balances with {transaction["points"]} points.')
         BALANCES.append(transaction)
     else:
         for balance in BALANCES:
             if balance["payer"] == transaction["payer"]:
-                balance["points"] += transaction["points"]
+                negativeCheck = balance["points"] + transaction["points"]
+                if negativeCheck < 0:
+                    print(
+                        f'Subtracting that amount will leave your points from {transaction["payer"]} in the negative. Unable to process.')
+                    # exit so that negative amount not shown.
+                    return
+                else:
+                    balance["points"] += transaction["points"]
             else:
-                print("didnt exist")
+                print(
+                    f'{transaction["payer"]} has been added to your Balances with {transaction["points"]} points.')
                 BALANCES.append(transaction)
-    print(BALANCES)
     return {"payer": transaction["payer"], "points": transaction["points"]}
 
 
 # make_balances(TRANSACTIONS)
 print(make_balance({"payer": "DANNON", "points": 1000,
                     "timestamp": "2020-11-02T14:00:00Z"}))
-print(make_balance({"payer": "DANNON", "points": -500,
+print(make_balance({"payer": "DANNON", "points": -1001,
                     "timestamp": "2020-11-02T14:00:00Z"}))
 print(make_balance(
     {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"}))
-# print(BALANCES)
