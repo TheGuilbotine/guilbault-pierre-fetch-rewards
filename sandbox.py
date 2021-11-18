@@ -1,3 +1,5 @@
+from datetime import datetime, time, timezone
+from operator import attrgetter
 TRANSACTIONS = [
     {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
     {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"},
@@ -9,6 +11,24 @@ TRANSACTIONS = [
 
 BALANCES = []
 
+# now = datetime.utcnow()
+# oldestTransaction = TRANSACTIONS[0]
+# oldestTimestamp = min(dt["timestamp"] for dt in TRANSACTIONS)
+# for transaction in TRANSACTIONS:
+#     if transaction["timestamp"] < oldestTimestamp:
+#         oldestTransaction = transaction
+#     print(oldestTransaction)
+
+
+def get_timestamp(obj):
+    return obj["timestamp"]
+
+
+orderedTransactions = [*TRANSACTIONS]
+# print(TRANSACTIONS)
+orderedTransactions.sort(
+    key=lambda transaction: transaction['timestamp'], reverse=True)
+print(orderedTransactions)
 
 # def make_balances(transaction):
 #     for transaction in transactions:
@@ -18,6 +38,7 @@ BALANCES = []
 #             BALANCES[transaction["payer"]] = {
 #                 "payer": transaction["payer"], "points": transaction["points"]}
 #     print(BALANCES)
+
 
 def make_balance(transaction):
     if len(BALANCES) == 0:
@@ -43,9 +64,9 @@ def make_balance(transaction):
 
 
 # make_balances(TRANSACTIONS)
-print(make_balance({"payer": "DANNON", "points": 1000,
-                    "timestamp": "2020-11-02T14:00:00Z"}))
-print(make_balance({"payer": "DANNON", "points": -1001,
-                    "timestamp": "2020-11-02T14:00:00Z"}))
-print(make_balance(
-    {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"}))
+# print(make_balance({"payer": "DANNON", "points": 1000,
+#                     "timestamp": "2020-11-02T14:00:00Z"}))
+# print(make_balance({"payer": "DANNON", "points": -1001,
+#                     "timestamp": "2020-11-02T14:00:00Z"}))
+# print(make_balance(
+#     {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"}))

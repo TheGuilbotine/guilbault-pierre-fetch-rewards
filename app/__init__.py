@@ -20,7 +20,7 @@ BALANCES = []
 def make_balance(transaction):
     if len(BALANCES) == 0:
         print(
-            f'{transaction["payer"]} has been added to your Balances with {transaction["points"]} points.')
+            f'{transaction["payer"]} has been added to Balances with {transaction["points"]} points.')
         BALANCES.append(transaction)
     else:
         for balance in BALANCES:
@@ -28,14 +28,14 @@ def make_balance(transaction):
                 negativeCheck = balance["points"] + transaction["points"]
                 if negativeCheck < 0:
                     print(
-                        f'Subtracting that amount will leave your points from {transaction["payer"]} in the negative. Unable to process.')
+                        f'Subtracting that amount will leave points from {transaction["payer"]} in the negative. Unable to process.')
                     # exit so that negative amount not shown.
                     return
                 else:
                     balance["points"] += transaction["points"]
             else:
                 print(
-                    f'{transaction["payer"]} has been added to your Balances with {transaction["points"]} points.')
+                    f'{transaction["payer"]} has been added to Balances with {transaction["points"]} points.')
                 BALANCES.append(transaction)
     return {"payer": transaction["payer"], "points": transaction["points"]}
 
@@ -82,8 +82,15 @@ def catch_points():
 @app.route('/spend_points', methods=['PUT'])
 def throw_points():
     """
-    Spends points in total from each of the most recent transaction times until points are spent
+    Spends points in total from each of the oldest90 transaction times until points are spent
     """
+    orderedTransactions = [*TRANSACTIONS]
+    orderedTransactions.sort(
+        key=lambda transaction: transaction['timestamp'])
+    data = request.get_json()
+    now = datetime.utcnow()
+    oldest = min(dt["timestamp"] for dt in BALANCES if dt < now)
+    print(oldest)
     pass
 
 
