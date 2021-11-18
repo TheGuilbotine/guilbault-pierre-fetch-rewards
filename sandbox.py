@@ -37,7 +37,7 @@ def make_balance(transaction):
 # make_balances(TRANSACTIONS)
 print(make_balance({"payer": "DANNON", "points": 1000,
                     "timestamp": "2020-11-02T14:00:00Z"}))
-print(make_balance({"payer": "DANNON", "points": 1000,
+print(make_balance({"payer": "DANNON", "points": -500,
                     "timestamp": "2020-11-02T14:00:00Z"}))
 print(make_balance(
     {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"}))
