@@ -39,12 +39,6 @@ def make_balance(transaction):
     return {"payer": transaction["payer"], "points": transaction["points"]}
 
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
-# example objects { "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
-
-
 @app.route('/')
 def balances():
     """
@@ -55,16 +49,13 @@ def balances():
         res[data_column["payer"]] = data_column["points"]
     return res
 
-# add transaction to route after / later
 
-
-@app.route('/', methods=['POST'])
+@app.route('/transaction', methods=['POST'])
 def catch_points():
     """
     Adds points from a specific payer and at a specific time
     """
     data = request.get_json()
-    # return data["payer"], 201
     payer = data["payer"]
     points = data["points"]
     utcDate = datetime.now(timezone.utc)
@@ -74,20 +65,15 @@ def catch_points():
     TRANSACTIONS.append(newTransaction)
     make_balance(newTransaction)
 
-    print(TRANSACTIONS)
-    print(BALANCES)
     return newTransaction, 201
 
-# add spend_points back to route
 
-
-@app.route('/', methods=['PUT'])
+@app.route('/spend_points', methods=['PUT'])
 def throw_points():
     """
     Spends points in total from each of the oldest90 transaction times until points are spent
     """
     data = request.get_json()
-    print(data)
     totalPointsToSpend = data["points"]
     pointsLeft = data["points"]
     orderedTransactions = [*TRANSACTIONS]
@@ -95,7 +81,6 @@ def throw_points():
         key=lambda transaction: transaction['timestamp'])
     if pointsLeft > 0:
         for transaction in orderedTransactions:
-            # if pointsSpent > transaction["points"]:
             pointsLeft = pointsLeft - transaction["points"]
             for balance in BALANCES:
                 if balance["payer"] == transaction["payer"]:
@@ -104,13 +89,6 @@ def throw_points():
                         balance["points"] = prevBalance - transaction["points"]
                     else:
                         balance["points"] = prevBalance - totalPointsToSpend
-                    # (pointsRemainingBefore - pointsRemainingAfter)
-            # else:
-                # print("less than")
-                # for balance in BALANCES:
-                #     if balance["payer"] == transaction["payer"]:
-                #         balance["points"] = balance["points"] - pointsSpent
-                #         # return f"All points spent. Balances are as follows {BALANCES}"
     else:
         print(f"All points have been spent. New balances are {BALANCES}")
     return f"Successfully spent points, balances are as follows{BALANCES}", 201
