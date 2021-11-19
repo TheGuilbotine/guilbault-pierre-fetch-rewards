@@ -1,17 +1,15 @@
-from datetime import datetime, time, timezone
+from datetime import datetime, timezone
 from flask import Flask, request
-# from flask_restful import Resource, Api, reqparse
 app = Flask(__name__)
-# api = Api(app)
 
 TRANSACTIONS = [
-    {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
-    {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
-    {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"},
-    {"payer": "DANNON", "points": -200, "timestamp": "2020-10-31T15:00:00Z"},
-    {"payer": "MILLER COORS", "points": 10000,
-        "timestamp": "2020-11-01T14:00:00Z"},
-    {"payer": "DANNON", "points": 300, "timestamp": "2020-10-31T10:00:00Z"}
+    # {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
+    # {"payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z"},
+    # {"payer": "UNILEVER", "points": 200, "timestamp": "2020-10-31T11:00:00Z"},
+    # {"payer": "DANNON", "points": -200, "timestamp": "2020-10-31T15:00:00Z"},
+    # {"payer": "MILLER COORS", "points": 10000,
+    #     "timestamp": "2020-11-01T14:00:00Z"},
+    # {"payer": "DANNON", "points": 300, "timestamp": "2020-10-31T10:00:00Z"}
 ]
 
 BALANCES = []
@@ -57,8 +55,10 @@ def balances():
         res[data_column["payer"]] = data_column["points"]
     return res
 
+# add transaction to route after / later
 
-@app.route('/transaction', methods=['POST'])
+
+@app.route('/', methods=['POST'])
 def catch_points():
     """
     Adds points from a specific payer and at a specific time
@@ -78,8 +78,10 @@ def catch_points():
     print(BALANCES)
     return newTransaction, 201
 
+# add spend_points back to route
 
-@app.route('/spend_points', methods=['PUT'])
+
+@app.route('/', methods=['PUT'])
 def throw_points():
     """
     Spends points in total from each of the oldest90 transaction times until points are spent
@@ -87,22 +89,28 @@ def throw_points():
     data = request.get_json()
     print(data)
     totalPointsToSpend = data["points"]
-    pointsSpent = data["points"]
+    pointsLeft = data["points"]
     orderedTransactions = [*TRANSACTIONS]
     orderedTransactions.sort(
         key=lambda transaction: transaction['timestamp'])
-    if pointsSpent > 0:
+    if pointsLeft > 0:
         for transaction in orderedTransactions:
-            pointsRemainingBefore = pointsSpent
-            pointsSpent -= transaction["points"]
-            pointsRemainingAfter = pointsSpent
+            # if pointsSpent > transaction["points"]:
+            pointsLeft = pointsLeft - transaction["points"]
             for balance in BALANCES:
                 if balance["payer"] == transaction["payer"]:
-                    balance["points"] = balance["points"] - pointsSpent
+                    prevBalance = balance["points"]
+                    if prevBalance < totalPointsToSpend:
+                        balance["points"] = prevBalance - transaction["points"]
+                    else:
+                        balance["points"] = prevBalance - totalPointsToSpend
                     # (pointsRemainingBefore - pointsRemainingAfter)
+            # else:
+                # print("less than")
+                # for balance in BALANCES:
+                #     if balance["payer"] == transaction["payer"]:
+                #         balance["points"] = balance["points"] - pointsSpent
+                #         # return f"All points spent. Balances are as follows {BALANCES}"
     else:
         print(f"All points have been spent. New balances are {BALANCES}")
     return f"Successfully spent points, balances are as follows{BALANCES}", 201
-
-
-# Do these need to be a PUT methods? Spend points should be I think. Will I also need to use forms?
