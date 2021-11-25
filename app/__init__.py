@@ -83,9 +83,12 @@ def throw_points():
     orderedTransactions = [*TRANSACTIONS]
     orderedTransactions.sort(
         key=lambda transaction: transaction['timestamp'], reverse=True)
-    print(orderedTransactions)
+    balancePoints = [BALANCES[key]["points"] for key in BALANCES]
+    print(balancePoints)
     if len(TRANSACTIONS) == 0:
         return "There are no Transactions", 102
+    elif all(points == 0 for points in balancePoints):
+        return "All balances are at zero.", 403
     else:
         for transaction in orderedTransactions:
             # for balance in BALANCES:
