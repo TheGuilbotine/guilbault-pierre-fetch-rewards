@@ -12,30 +12,27 @@ TRANSACTIONS = [
     # {"payer": "DANNON", "points": 300, "timestamp": "2020-10-31T10:00:00Z"}
 ]
 
-BALANCES = []
+BALANCES = {}
 
 
 def make_balance(transaction):
-    if len(BALANCES) == 0:
+    if transaction["payer"] not in BALANCES:
+        BALANCES[transaction["payer"]] = {
+            "payer": transaction["payer"], "points": transaction["points"]}
         print(
             f'{transaction["payer"]} has been added to Balances with {transaction["points"]} points.')
-        BALANCES.append(transaction)
     else:
-        for balance in BALANCES:
-            if balance["payer"] == transaction["payer"]:
-                negativeCheck = balance["points"] + transaction["points"]
-                if negativeCheck < 0:
-                    print(
-                        f'Subtracting that amount will leave points from {transaction["payer"]} in the negative. Unable to process.')
-                    # exit so that negative amount not shown.
-                    return
-                else:
-                    balance["points"] = balance["points"] + \
-                        transaction["points"]
-            else:
-                print(
-                    f'{transaction["payer"]} has been added to Balances with {transaction["points"]} points.')
-                BALANCES.append(transaction)
+        negativeCheck = BALANCES[transaction["payer"]
+                                 ]["points"] + transaction["points"]
+        if negativeCheck < 0:
+            print(
+                f'Subtracting that amount will leave points from {transaction["payer"]} in the negative. Unable to process.')
+            # exit so that negative amount not shown.
+            return
+        else:
+            BALANCES[transaction["payer"]]["points"] += transaction["points"]
+            print(
+                f'{transaction["payer"]} has been added to Balances with {transaction["points"]} points.')
     return {"payer": transaction["payer"], "points": transaction["points"]}
 
 
@@ -45,12 +42,17 @@ def balances():
     Returns all current balances
     """
     res = {}
-    for data_column in BALANCES:
-        res[data_column["payer"]] = data_column["points"]
-    return res
+    if BALANCES == {}:
+        return "Currently no balances."
+    else:
+        for key in BALANCES:
+            res[BALANCES[key]["payer"]] = BALANCES[key]["points"]
+        return res
+
+# transaction
 
 
-@app.route('/transaction', methods=['POST'])
+@app.route('/', methods=['POST'])
 def catch_points():
     """
     Adds points from a specific payer and at a specific time
@@ -67,28 +69,41 @@ def catch_points():
 
     return newTransaction, 201
 
+# spend_points
 
-@app.route('/spend_points', methods=['PUT'])
+
+@app.route('/', methods=['PUT'])
 def throw_points():
     """
-    Spends points in total from each of the oldest90 transaction times until points are spent
+    Spends points in total from each of the oldest transaction timestamps until points are spent
     """
     data = request.get_json()
     totalPointsToSpend = data["points"]
-    pointsLeft = data["points"]
+    pointsSpent = 0
     orderedTransactions = [*TRANSACTIONS]
     orderedTransactions.sort(
         key=lambda transaction: transaction['timestamp'])
-    if pointsLeft > 0:
-        for transaction in orderedTransactions:
-            pointsLeft = pointsLeft - transaction["points"]
-            for balance in BALANCES:
-                if balance["payer"] == transaction["payer"]:
-                    prevBalance = balance["points"]
-                    if prevBalance < totalPointsToSpend:
-                        balance["points"] = prevBalance - transaction["points"]
-                    else:
-                        balance["points"] = prevBalance - totalPointsToSpend
-    else:
-        print(f"All points have been spent. New balances are {BALANCES}")
-    return f"Successfully spent points, balances are as follows{BALANCES}", 201
+    for transaction in orderedTransactions:
+        for balance in BALANCES:
+            #  and balance["points"] >= transaction["points"]
+            if balance["payer"] == transaction["payer"]:
+                if totalPointsToSpend != pointsSpent:
+                    balance["points"] -= transaction["points"]
+                    pointsSpent += transaction["points"]
+                else:
+                    return f"All points spent current balances are {BALANCES}", 201
+    # return {BALANCES}, 201
+
+    # if pointsLeft > 0:
+    #     for transaction in orderedTransactions:
+    #         pointsLeft = pointsLeft - transaction["points"]
+    #         for balance in BALANCES:
+    #             if balance["payer"] == transaction["payer"]:
+    #                 prevBalance = balance["points"]
+    #                 if prevBalance < totalPointsToSpend:
+    #                     balance["points"] = prevBalance - transaction["points"]
+    #                 else:
+    #                     balance["points"] = prevBalance - totalPointsToSpend
+    # else:
+    #     print(f"All points have been spent. New balances are {BALANCES}")
+    # return f"Successfully spent points, balances are as follows{BALANCES}", 201
