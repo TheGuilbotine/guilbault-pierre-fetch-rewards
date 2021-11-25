@@ -82,16 +82,21 @@ def throw_points():
     pointsSpent = 0
     orderedTransactions = [*TRANSACTIONS]
     orderedTransactions.sort(
-        key=lambda transaction: transaction['timestamp'])
-    for transaction in orderedTransactions:
-        # for balance in BALANCES:
-        #     #  and balance["points"] >= transaction["points"]
-        #     if balance["payer"] == transaction["payer"]:
-        if totalPointsToSpend != pointsSpent:
-            BALANCES[transaction["payer"]]["points"] -= transaction["points"]
-            pointsSpent += transaction["points"]
-        else:
-            return f"All points spent current balances are {BALANCES}", 201
+        key=lambda transaction: transaction['timestamp'], reverse=True)
+    print(orderedTransactions)
+    if len(TRANSACTIONS) == 0:
+        return "There are no Transactions", 102
+    else:
+        for transaction in orderedTransactions:
+            # for balance in BALANCES:
+            #     #  and balance["points"] >= transaction["points"]
+            #     if balance["payer"] == transaction["payer"]:
+            if totalPointsToSpend != pointsSpent:
+                BALANCES[transaction["payer"]
+                         ]["points"] -= transaction["points"]
+                pointsSpent += transaction["points"]
+            else:
+                return f"All points spent current balances are {BALANCES}", 201
     # return {BALANCES}, 201
 
     # if pointsLeft > 0:
