@@ -91,17 +91,27 @@ def throw_points():
         return "All balances are at zero.", 403
     else:
         for transaction in orderedTransactions:
+            print('before conditionals', BALANCES)
             # for balance in BALANCES:
             #     #  and balance["points"] >= transaction["points"]
             #     if balance["payer"] == transaction["payer"]:
             if totalPointsToSpend != pointsSpent:
+                pointsLeft = totalPointsToSpend - pointsSpent
+                if transaction["points"] >= pointsLeft:
+                    pointsToSpend = pointsLeft
+                else:
+                    pointsToSpend = transaction["points"]
                 if BALANCES[transaction["payer"]
-                            ]["points"] != 0:
+                            ]["points"] != 0 and (BALANCES[transaction["payer"]]["points"] - pointsToSpend) >= 0:
                     BALANCES[transaction["payer"]
-                             ]["points"] -= transaction["points"]
-                    pointsSpent += transaction["points"]
-            else:
-                return f"All points spent current balances are {BALANCES}", 201
+                             ]["points"] -= pointsToSpend
+                    pointsSpent += pointsToSpend
+                else:
+                    pointsSpent + BALANCES[transaction["payer"]]["points"]
+                    BALANCES[transaction["payer"]]["points"] = 0
+                    print("Points spent here---->", pointsSpent)
+            print('after conditionals', BALANCES)
+    return f"All points spent current balances are {BALANCES}", 201
     # return {BALANCES}, 201
 
     # if pointsLeft > 0:
