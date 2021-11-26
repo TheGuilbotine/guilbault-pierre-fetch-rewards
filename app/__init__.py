@@ -84,7 +84,6 @@ def throw_points():
     orderedTransactions.sort(
         key=lambda transaction: transaction['timestamp'], reverse=True)
     balancePoints = [BALANCES[key]["points"] for key in BALANCES]
-    print(balancePoints)
     if totalPointsToSpend > sum(balancePoints):
         return "Points to spend exceeds total points in Balances."
     if len(TRANSACTIONS) == 0:
@@ -93,7 +92,6 @@ def throw_points():
         return "All balances are at zero.", 403
     else:
         for transaction in orderedTransactions:
-            print('before conditionals', BALANCES)
             if totalPointsToSpend != pointsSpent:
                 pointsLeft = totalPointsToSpend - pointsSpent
                 if transaction["points"] >= pointsLeft:
@@ -108,6 +106,4 @@ def throw_points():
                 else:
                     pointsSpent + BALANCES[transaction["payer"]]["points"]
                     BALANCES[transaction["payer"]]["points"] = 0
-                    print("Points spent here---->", pointsSpent)
-            print('after conditionals', BALANCES)
     return f"All points spent current balances are {BALANCES}", 201
