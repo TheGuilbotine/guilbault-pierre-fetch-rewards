@@ -71,6 +71,8 @@ def catch_points():
 
 # spend_points
 
+# some how the amount to spend stays the same and will subtract that full amount from the next balance if it excedes the amount of the previous balance.
+
 
 @app.route('/', methods=['PUT'])
 def throw_points():
