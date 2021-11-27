@@ -49,6 +49,21 @@ def balances():
             res[BALANCES[key]["payer"]] = BALANCES[key]["points"]
         return res
 
+
+@app.route('/transactions')
+def transactions():
+    """
+    Returns all transactions
+    """
+    res = {}
+    if TRANSACTIONS == []:
+        return "There have been no transactions."
+    else:
+        for transaction in TRANSACTIONS:
+            res[len(res) + 1] = {"payer": transaction["payer"], "points": transaction["points"],
+                                 "spent": transaction["spent"], "timestamp": transaction["timestamp"]}
+        return res
+
 # transaction
 
 
@@ -62,7 +77,7 @@ def catch_points():
     points = data["points"]
     utcDate = datetime.now(timezone.utc)
     timestamp = utcDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-    newTransaction = {"payer": payer, "points": points,
+    newTransaction = {"payer": payer, "points": points, "spent": False,
                       "timestamp": timestamp}
     TRANSACTIONS.append(newTransaction)
     make_balance(newTransaction)
@@ -94,18 +109,23 @@ def throw_points():
         return "All balances are at zero.", 403
     else:
         for transaction in orderedTransactions:
-            if totalPointsToSpend != pointsSpent and transaction["points"] >= 0:
+            if totalPointsToSpend != pointsSpent and transaction["points"] >= 0 and transaction["spent"] == False:
                 pointsLeft = totalPointsToSpend - pointsSpent
                 if transaction["points"] >= pointsLeft:
                     pointsToSpend = pointsLeft
                 else:
                     pointsToSpend = transaction["points"]
-                if BALANCES[transaction["payer"]
-                            ]["points"] != 0 and (BALANCES[transaction["payer"]]["points"] - pointsToSpend) >= 0:
-                    BALANCES[transaction["payer"]
-                             ]["points"] -= pointsToSpend
-                    pointsSpent += pointsToSpend
-                else:
-                    pointsSpent + BALANCES[transaction["payer"]]["points"]
-                    BALANCES[transaction["payer"]]["points"] = 0
+                if BALANCES[transaction["payer"]]["points"] != 0:
+                    if (BALANCES[transaction["payer"]]["points"] - pointsToSpend) >= 0:
+                        BALANCES[transaction["payer"]
+                                 ]["points"] -= pointsToSpend
+                        pointsSpent += pointsToSpend
+                    else:
+                        balanceLeft = BALANCES[transaction["payer"]]["points"]
+                        pointsSpent + balanceLeft
+                        BALANCES[transaction["payer"]]["points"] = 0
+# TODO check when to make transaction spent or not.
+                    # if BALANCES[transaction["payer"]]["points"] -  == 0:
+                    #     transaction["spent"] = True
+
     return f"All points spent current balances are {BALANCES}", 201
