@@ -61,7 +61,7 @@ def transactions():
     else:
         for transaction in TRANSACTIONS:
             res[len(res) + 1] = {"payer": transaction["payer"], "points": transaction["points"],
-                                 "spent": transaction["spent"], "timestamp": transaction["timestamp"]}
+                                 "points_spent": transaction["points_spent"], "timestamp": transaction["timestamp"]}
         return res
 
 # transaction
@@ -77,7 +77,7 @@ def catch_points():
     points = data["points"]
     utcDate = datetime.now(timezone.utc)
     timestamp = utcDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-    newTransaction = {"payer": payer, "points": points, "spent": False,
+    newTransaction = {"payer": payer, "points": points, "points_spent": 0,
                       "timestamp": timestamp}
     TRANSACTIONS.append(newTransaction)
     make_balance(newTransaction)
@@ -109,13 +109,23 @@ def throw_points():
         return "All balances are at zero.", 403
     else:
         for transaction in orderedTransactions:
-            if totalPointsToSpend != pointsSpent and transaction["points"] >= 0 and transaction["spent"] == False:
+            if totalPointsToSpend != pointsSpent and transaction["points"] >= 0 and transaction["points_spent"] < transaction["points"]:
                 pointsLeft = totalPointsToSpend - pointsSpent
                 if transaction["points"] >= pointsLeft:
                     pointsToSpend = pointsLeft
                 else:
                     pointsToSpend = transaction["points"]
                 if BALANCES[transaction["payer"]]["points"] != 0:
+                    # need to check transaction vs balances because balances will be greater than a transacion at times.
+                    if BALANCES[transaction["payer"]]["points"] == pointsToSpend:
+                        transaction["points_spent"] = pointsToSpend
+                    elif BALANCES[transaction["payer"]]["points"] > pointsToSpend:
+                        transaction["points_spent"] = BALANCES[transaction["payer"]
+                                                               ]["points"] - pointsToSpend
+                    else:
+                        transaction["points_spent"] = pointsToSpend - \
+                            BALANCES[transaction["payer"]]["points"]
+
                     if (BALANCES[transaction["payer"]]["points"] - pointsToSpend) >= 0:
                         BALANCES[transaction["payer"]
                                  ]["points"] -= pointsToSpend
@@ -124,6 +134,7 @@ def throw_points():
                         balanceLeft = BALANCES[transaction["payer"]]["points"]
                         pointsSpent + balanceLeft
                         BALANCES[transaction["payer"]]["points"] = 0
+
 # TODO check when to make transaction spent or not.
                     # if BALANCES[transaction["payer"]]["points"] -  == 0:
                     #     transaction["spent"] = True
