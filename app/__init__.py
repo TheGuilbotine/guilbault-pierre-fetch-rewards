@@ -117,11 +117,11 @@ def throw_points():
                     pointsToSpend = transaction["points"]
                 if BALANCES[transaction["payer"]]["points"] != 0:
                     # need to check transaction vs balances because balances will be greater than a transacion at times.
-                    if BALANCES[transaction["payer"]]["points"] == pointsToSpend:
+                    if BALANCES[transaction["payer"]]["points"] == pointsToSpend and transaction["points"] == pointsToSpend:
                         transaction["points_spent"] = pointsToSpend
-                    elif BALANCES[transaction["payer"]]["points"] > pointsToSpend:
-                        transaction["points_spent"] = BALANCES[transaction["payer"]
-                                                               ]["points"] - pointsToSpend
+                    elif BALANCES[transaction["payer"]]["points"] > pointsToSpend and transaction["points"] == pointsToSpend:
+                        transaction["points_spent"] = transaction["points"] - \
+                            pointsToSpend
                     else:
                         transaction["points_spent"] = pointsToSpend - \
                             BALANCES[transaction["payer"]]["points"]
@@ -134,9 +134,5 @@ def throw_points():
                         balanceLeft = BALANCES[transaction["payer"]]["points"]
                         pointsSpent + balanceLeft
                         BALANCES[transaction["payer"]]["points"] = 0
-
-# TODO check when to make transaction spent or not.
-                    # if BALANCES[transaction["payer"]]["points"] -  == 0:
-                    #     transaction["spent"] = True
 
     return f"All points spent current balances are {BALANCES}", 201
