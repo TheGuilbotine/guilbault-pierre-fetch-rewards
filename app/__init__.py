@@ -1,6 +1,5 @@
 from flask import Flask, request
 
-
 app = Flask(__name__)
 
 TRANSACTIONS = []
@@ -101,6 +100,7 @@ def throw_points():
     """
     Spends points in total from each of the oldest transaction timestamps until points are spent
     """
+    res = []
     data = request.get_json()
     totalPointsToSpend = data["points"]
     pointsSpent = 0
@@ -141,13 +141,18 @@ def throw_points():
 
                 # If the balance corresponding with the transactions payer is not zero and there transaction points have not been spent
                 if BALANCES[transaction["payer"]]["points"] != 0 and transaction["points_spent"] != transaction["points"]:
-
                     # set points_spent to pointsToSpend if there are more or the same balance points than pointsToSpend
                     if pointsToSpend <= BALANCES[transaction["payer"]]["points"]:
                         transaction["points_spent"] += pointsToSpend
+                        # add info to the response including the payer name and the amount spent as a negative integer
+                        res.append(
+                            {transaction["payer"]: -pointsToSpend})
                     # otherwise set points_spent to equal points
                     else:
                         transaction["points_spent"] = transaction["points"]
+                        # add info to the response including the payer name and the amount spent as a negative integer
+                        res.append(
+                            {transaction["payer"]: -transaction["points"]})
 
                     # if subtracting the pointsToSpend from the balance will not make it negative
                     if (BALANCES[transaction["payer"]]["points"] - pointsToSpend) >= 0:
@@ -165,5 +170,5 @@ def throw_points():
                         # and then make that balances points zero
                         BALANCES[transaction["payer"]]["points"] = 0
 
-    # return all balances in their current states
-    return f"All points spent current balances are {BALANCES}", 201
+    # return all payers with amounts spent
+    return f"{res}", 201
