@@ -44,11 +44,14 @@ def balances():
     """
     Returns all current balances
     """
+    # response to return
     res = {}
+    # check for balances
     if BALANCES == {}:
         return "Currently no balances."
     else:
         for key in BALANCES:
+            # add each balance to the res to return a dictionary of all balances
             res[BALANCES[key]["payer"]] = BALANCES[key]["points"]
         return res
 
