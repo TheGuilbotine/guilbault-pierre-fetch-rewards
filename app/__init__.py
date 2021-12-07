@@ -79,15 +79,20 @@ def catch_points():
     """
     Adds points from a specific payer and at a specific time
     """
+
     data = request.get_json()
     payer = data["payer"]
     points = data["points"]
     timestamp = data["timestamp"]
+    # add pulled information to a new transaction including a key starting at zero points to compare to points later
     newTransaction = {"payer": payer, "points": points, "points_spent": 0,
                       "timestamp": timestamp}
+    # add the new transaction to the end of the list
     TRANSACTIONS.append(newTransaction)
+    # create or add to BALANCES
     make_balance(newTransaction)
 
+    # return information for new transaction
     return newTransaction, 201
 
 
