@@ -146,13 +146,13 @@ def throw_points():
                         transaction["points_spent"] += pointsToSpend
                         # add info to the response including the payer name and the amount spent as a negative integer
                         res.append(
-                            {transaction["payer"]: -pointsToSpend})
+                            {"payer": transaction["payer"], "points": -pointsToSpend})
                     # otherwise set points_spent to equal points
                     else:
                         transaction["points_spent"] = transaction["points"]
                         # add info to the response including the payer name and the amount spent as a negative integer
                         res.append(
-                            {transaction["payer"]: -transaction["points"]})
+                            {"payer": transaction["payer"], "points": -transaction["points"]})
 
                     # if subtracting the pointsToSpend from the balance will not make it negative
                     if (BALANCES[transaction["payer"]]["points"] - pointsToSpend) >= 0:
