@@ -7,6 +7,13 @@ TRANSACTIONS = []
 
 BALANCES = {}
 
+'''
+@param transaction will be the transaction from a request made to the / GET route
+it will check if the transaction payer exists in BALANCES
+if it is not it will create a key with that payers name pointing to a dictionary with the payer and points
+otherwise it will add the points from the new transaction to the existing balance points for that payer
+'''
+
 
 def make_balance(transaction):
     if transaction["payer"] not in BALANCES:
