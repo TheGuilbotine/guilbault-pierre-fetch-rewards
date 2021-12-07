@@ -61,11 +61,14 @@ def transactions():
     """
     Returns all transactions
     """
+    # response to return
     res = {}
+    # check for transactions
     if TRANSACTIONS == []:
         return "There have been no transactions."
     else:
         for transaction in TRANSACTIONS:
+            # create an id that increments pointing to a dictionary for each transactions information
             res[len(res) + 1] = {"payer": transaction["payer"], "points": transaction["points"],
                                  "points_spent": transaction["points_spent"], "timestamp": transaction["timestamp"]}
         return res
